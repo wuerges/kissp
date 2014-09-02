@@ -34,12 +34,11 @@ module memory(
 
 reg[31:0] bank [0:31];
 
-assign r_v = bank[addr];
+assign r_v = addr == 0 ? 0 : bank[addr];
 
 always @(w, addr, w_v)
     if (w)
         bank[addr] = w_v;
-
 endmodule
 
 
@@ -61,7 +60,7 @@ module processor(
     input clk
 );
     reg[4:0] src1, src2, dst;
-    reg signed[4:0] imm;
+    reg signed[31:0] imm;
     reg r_w, m_w, op, r_src;
 
     wire[31:0] src1_v, src2_v, src3_v, alu_out, pc, w_v, mr_v;
@@ -81,7 +80,7 @@ module processor(
         src1 = insn[4:0];
         src2 = insn[9:5];
         dst  = insn[14:10];
-        imm  = insn[19:15];
+        imm  = $signed(insn[19:15]);
         m_w  = insn[20];
         r_w  = insn[21];
         op   = insn[22];
