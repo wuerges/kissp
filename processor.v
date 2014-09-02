@@ -1,5 +1,6 @@
 
 module registers(
+    input clk,
     input w,
     input[4:0] dst,
     input[4:0] src1,
@@ -11,20 +12,17 @@ module registers(
     output[31:0] reg_31
 );
 
-initial begin
-    bank[31] = 0;
-end
-
 reg [31:0] bank [0:31];
-
 assign src1_v = src1 == 0 ? 0 : bank[src1];
 assign src2_v = src2 == 0 ? 0 : bank[src2];
 assign src3_v = dst  == 0 ? 0 : bank[dst];
 assign reg_31 = bank[31];
 
-always @(w, dst, w_v)
+always @(negedge clk)
+begin
     if (w)
-        bank[dst] = w_v;
+        bank[dst] <= w_v;
+end
 endmodule
 
 
@@ -56,6 +54,7 @@ module alu(
 assign out = op ? 
                 src1_v + src2_v + src3_v : 
                 src1_v - src2_v + src3_v;
+
 endmodule
 
 module processor(
@@ -70,43 +69,46 @@ module processor(
 );
     reg[4:0] src1, src2, dst;
     reg signed[31:0] imm;
+
     reg r_w, m_w, op, r_src, b;
 
-    wire[31:0] src1_v, src2_v, src3_v, alu_out, w_v, mr_v, reg_31;
-    reg[31:0] pc;
+    wire[31:0] src1_v, src2_v, src3_v, mr_v, reg_31, alu_out, w_v;
+    reg signed [31:0] pc;
 
-    assign w_v = r_src ? alu_out : mr_v;
 
     assign insn_addr = pc;
 
     alu a1(src1_v, src2_v, imm, op, alu_out);
-    registers bank(r_w, dst, src1, src2, w_v, 
+    registers bank(clk, r_w, dst, src1, src2, w_v, 
         src1_v, src2_v, src3_v, reg_31);
-
+        
+    assign w_v  = ~r_src ? alu_out : mr_v;
     assign mr_v = data_in;
 
 
     //memory data(m_w, alu_out, src3_v, mr_v);
     //memory insn_m(0, pc, 0, insn);
 
-    initial
+    initial begin
         pc = 0;
+    end
 
     always @( posedge clk ) begin
-        src1 = insn[4:0];
-        src2 = insn[9:5];
-        dst  = insn[14:10];
-        imm  = $signed(insn[19:15]);
-        m_w  = insn[20];
-        r_w  = insn[21];
-        op   = insn[22];
-        r_src = insn[23];
-        b = insn[24];
+        src1 <= insn[4:0];
+        src2 <= insn[9:5];
+        dst  <= insn[14:10];
+        imm  <= $signed(insn[19:15]);
+
+        m_w  <= insn[20];
+        r_w  <= insn[21];
+        op   <= insn[22];
+        r_src <= insn[23];
+        b <= insn[24];
 
         if (b)
-            pc = reg_31;
+            pc <= pc + reg_31;
         else
-            pc = pc + 1;
+            pc <= pc + 1;
     end
 
 endmodule
