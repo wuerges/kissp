@@ -17,14 +17,13 @@ assign src2_v = src2 == 0 ? 0 : bank[src2];
 assign src3_v = dst  == 0 ? 0 : bank[dst];
 
 always @(negedge clk)
-begin
     if (w)
         bank[dst] <= w_v;
-end
 endmodule
 
 
 module memory(
+    input clk,
     input w,
     input[31:0] addr,
     input[31:0] w_v,
@@ -35,9 +34,9 @@ reg[31:0] bank [0:4096];
 
 assign r_v = bank[addr];
 
-always @(w, addr, w_v)
+always @(negedge clk)
     if (w)
-        bank[addr] = w_v;
+        bank[addr] <= w_v;
 endmodule
 
 
