@@ -11,17 +11,20 @@ module registers(
     output[31:0] reg_31
 );
 
+initial begin
+    bank[31] = 0;
+end
+
 reg [31:0] bank [0:31];
 
-assign src1_v = bank[src1];
-assign src2_v = bank[src2];
-assign src2_v = bank[dst];
-assign reg_31 = bank[0];
+assign src1_v = src1 == 0 ? 0 : bank[src1];
+assign src2_v = src2 == 0 ? 0 : bank[src2];
+assign src3_v = dst  == 0 ? 0 : bank[dst];
+assign reg_31 = bank[31];
 
 always @(w, dst, w_v)
     if (w)
         bank[dst] = w_v;
-
 endmodule
 
 
@@ -32,9 +35,9 @@ module memory(
     output[31:0] r_v
 );
 
-reg[31:0] bank [0:31];
+reg[31:0] bank [0:4096];
 
-assign r_v = addr == 0 ? 0 : bank[addr];
+assign r_v = bank[addr];
 
 always @(w, addr, w_v)
     if (w)
@@ -55,26 +58,39 @@ assign out = op ?
                 src1_v - src2_v + src3_v;
 endmodule
 
-
 module processor(
-    input clk
+    input clk,
+    input[31:0] insn,
+    output[31:0] insn_addr,
+    
+    output data_w,
+    output[31:0] data_out,
+    input[31:0] data_in,
+    output[31:0] data_addr
 );
     reg[4:0] src1, src2, dst;
     reg signed[31:0] imm;
-    reg r_w, m_w, op, r_src;
+    reg r_w, m_w, op, r_src, b;
 
-    wire[31:0] src1_v, src2_v, src3_v, alu_out, pc, w_v, mr_v;
-    wire[31:0] insn;
+    wire[31:0] src1_v, src2_v, src3_v, alu_out, w_v, mr_v, reg_31;
+    reg[31:0] pc;
 
     assign w_v = r_src ? alu_out : mr_v;
 
+    assign insn_addr = pc;
+
     alu a1(src1_v, src2_v, imm, op, alu_out);
     registers bank(r_w, dst, src1, src2, w_v, 
-        src1_v, src2_v, src3_v, pc);
+        src1_v, src2_v, src3_v, reg_31);
 
-    memory data(m_w, alu_out, src3_v, mr_v);
-    memory insn_m(0, pc, 0, insn);
+    assign mr_v = data_in;
 
+
+    //memory data(m_w, alu_out, src3_v, mr_v);
+    //memory insn_m(0, pc, 0, insn);
+
+    initial
+        pc = 0;
 
     always @( posedge clk ) begin
         src1 = insn[4:0];
@@ -85,6 +101,12 @@ module processor(
         r_w  = insn[21];
         op   = insn[22];
         r_src = insn[23];
+        b = insn[24];
+
+        if (b)
+            pc = reg_31;
+        else
+            pc = pc + 1;
     end
 
 endmodule
