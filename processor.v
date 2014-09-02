@@ -8,15 +8,13 @@ module registers(
     input[31:0] w_v,
     output[31:0] src1_v,
     output[31:0] src2_v,
-    output[31:0] src3_v,
-    output[31:0] reg_31
+    output[31:0] src3_v
 );
 
 reg [31:0] bank [0:31];
 assign src1_v = src1 == 0 ? 0 : bank[src1];
 assign src2_v = src2 == 0 ? 0 : bank[src2];
 assign src3_v = dst  == 0 ? 0 : bank[dst];
-assign reg_31 = bank[31];
 
 always @(negedge clk)
 begin
@@ -72,7 +70,7 @@ module processor(
 
     reg r_w, m_w, op, r_src, b;
 
-    wire[31:0] src1_v, src2_v, src3_v, mr_v, reg_31, alu_out, w_v;
+    wire[31:0] src1_v, src2_v, src3_v, mr_v, alu_out, w_v;
     reg signed [31:0] pc;
 
 
@@ -80,7 +78,7 @@ module processor(
 
     alu a1(src1_v, src2_v, imm, op, alu_out);
     registers bank(clk, r_w, dst, src1, src2, w_v, 
-        src1_v, src2_v, src3_v, reg_31);
+        src1_v, src2_v, src3_v);
         
     assign w_v  = ~r_src ? alu_out : mr_v;
     assign mr_v = data_in;
@@ -106,7 +104,7 @@ module processor(
         b <= insn[24];
 
         if (b)
-            pc <= pc + reg_31;
+            pc <= pc + w_v;
         else
             pc <= pc + 1;
     end
