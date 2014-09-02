@@ -64,7 +64,8 @@ module processor(
     reg signed[4:0] imm;
     reg r_w, m_w, op, r_src;
 
-    wire[31:0] insn, src1_v, src2_v, src3_v, alu_out, pc, w_v, mr_v;
+    wire[31:0] src1_v, src2_v, src3_v, alu_out, pc, w_v, mr_v;
+    wire[31:0] insn;
 
     assign w_v = r_src ? alu_out : mr_v;
 
@@ -72,9 +73,19 @@ module processor(
     registers bank(r_w, dst, src1, src2, w_v, 
         src1_v, src2_v, src3_v, pc);
 
+    memory data(m_w, alu_out, src3_v, mr_v);
+    memory insn_m(0, pc, 0, insn);
+
 
     always @( posedge clk ) begin
-
+        src1 = insn[4:0];
+        src2 = insn[9:5];
+        dst  = insn[14:10];
+        imm  = insn[19:15];
+        m_w  = insn[20];
+        r_w  = insn[21];
+        op   = insn[22];
+        r_src = insn[23];
     end
 
 endmodule
