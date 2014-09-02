@@ -83,10 +83,6 @@ module processor(
     assign w_v  = ~r_src ? alu_out : mr_v;
     assign mr_v = data_in;
 
-
-    //memory data(m_w, alu_out, src3_v, mr_v);
-    //memory insn_m(0, pc, 0, insn);
-
     initial begin
         pc = 0;
     end
