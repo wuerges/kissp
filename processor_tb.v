@@ -12,17 +12,17 @@ clk = 0;
 // load immediate 1 to reg 1
 insn_m.bank[00] = 'b0_0_0_1_0_00001_00001_00000_00000;
 // load immediate 2 to reg 2
-insn_m.bank[01] = 0;
+insn_m.bank[01] = 'b0_0_0_1_0_00010_00010_00000_00000;
 // load immediate 3 to reg 3
-insn_m.bank[02] = 0;
-insn_m.bank[03] = 0;
-insn_m.bank[04] = 0;
-insn_m.bank[05] = 0;
-insn_m.bank[06] = 0;
-insn_m.bank[07] = 0;
-insn_m.bank[08] = 0;
-insn_m.bank[09] = 0;
-insn_m.bank[10] = 0;
+insn_m.bank[02] = 'b0_0_0_1_0_00011_00011_00000_00000;
+insn_m.bank[03] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[04] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[05] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[06] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[07] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[08] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[09] = 'b0_0_0_0_0_00000_00000_00000_00000;
+insn_m.bank[10] = 'b0_0_0_0_0_00000_00000_00000_00000;
 
 #50 $finish;
 end
