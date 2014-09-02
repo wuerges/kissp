@@ -64,7 +64,9 @@ module processor(
     reg signed[4:0] imm;
     reg r_w, m_w, op, r_src;
 
-    wire[31:0] insn, src1_v, src2_v, src3_v, alu_out, pc, w_v;
+    wire[31:0] insn, src1_v, src2_v, src3_v, alu_out, pc, w_v, mr_v;
+
+    assign w_v = r_src ? alu_out : mr_v;
 
     alu a1(src1_v, src2_v, imm, op, alu_out);
     registers bank(r_w, dst, src1, src2, w_v, 
