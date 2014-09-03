@@ -1,5 +1,5 @@
 
-module processor_p(
+module processor_pipeline(
     input clk,
     input[31:0] insn,
     output[31:0] insn_addr,

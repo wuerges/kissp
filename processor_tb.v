@@ -1,6 +1,14 @@
-module processor_tb();
+module processor_tb(
+	output clk_o
+	);
 
 reg clk;
+
+assign clk_o = clk;
+
+memory insn_m(clk, 0, pc, 0, insn);
+memory data(clk, m_w, data_addr, data_out, data_in);
+
 
 initial begin
     $dumpvars;
@@ -9,6 +17,7 @@ initial begin
 
 #0 
 clk = 0;
+/*
 insn_m.bank[00] = 'b0_0_1_1_0_00001_00001_00000_00000;   // r1 = 1
 insn_m.bank[01] = 'b0_0_1_1_0_00010_00010_00000_00000;   // r2 = 2
 insn_m.bank[02] = 'b0_0_1_1_0_00011_00011_00000_00000;   // r3 = 3
@@ -20,7 +29,7 @@ insn_m.bank[07] = 'b0_0_0_0_0_00000_00000_00000_00000;
 insn_m.bank[08] = 'b0_0_0_0_0_00000_00000_00000_00000;
 insn_m.bank[09] = 'b0_0_0_0_0_00000_00000_00000_00000;
 insn_m.bank[10] = 'b0_0_0_0_0_00000_00000_00000_00000;
-
+*/
 
 
 #1000 $finish;
@@ -31,7 +40,7 @@ wire [31:0] pc, insn;
 wire [31:0] data_addr, data_in, data_out;
 wire m_w;
 
-processor_p p1(
+processor_pipeline p1(
     clk, 
     insn, pc, 
     m_w,
@@ -39,9 +48,6 @@ processor_p p1(
     data_in,  // data read from memory
     data_addr // address to read/write
     );
-memory insn_m(clk, 0, pc, 0, insn);
-memory data(clk, m_w, data_addr, data_out, data_in);
-
 
 always #5 clk = !clk;
 
