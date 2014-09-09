@@ -23,6 +23,21 @@ assign d_r2 = bank[2];
 assign d_r3 = bank[3];
 assign d_r4 = bank[4];
 
+always @(negedge clk)
+    if (w)
+        bank[dst] <= w_v;
+endmodule
+
+
+
+module memory(
+    input clk,
+    input w,
+    input[31:0] addr,
+    input[31:0] w_v,
+    output[31:0] r_v
+);
+
 initial begin
 	bank[00] = 'b0_0_1_1_0_00001_00001_00000_00000;   // r1 = 1
 	bank[01] = 'b0_0_1_1_0_00010_00010_00000_00000;   // r2 = 2
@@ -38,20 +53,6 @@ initial begin
 end
 
 
-always @(negedge clk)
-    if (w)
-        bank[dst] <= w_v;
-endmodule
-
-
-
-module memory(
-    input clk,
-    input w,
-    input[31:0] addr,
-    input[31:0] w_v,
-    output[31:0] r_v
-);
 
 reg[31:0] bank [0:4096];
 
